@@ -39,7 +39,7 @@ class DNSCache {
    * @return {number}
    */
   getTimeUntilResolution(request, options) {
-    const {requestedAt = 0, shouldUpdateCache = false} = options || {}
+    const {requestedAt = 0, shouldUpdateCache = false} = options || {};
 
     const domain = request.parsedURL.host;
     const cacheEntry = this._resolvedDomainNames.get(domain);
@@ -76,7 +76,7 @@ class DNSCache {
   setResolvedAt(domain, resolvedAt) {
     this._resolvedDomainNames.set(domain, {resolvedAt});
   }
-};
+}
 
 DNSCache.RTT_MULTIPLIER = DNS_RESOLUTION_RTT_MULTIPLIER;
 

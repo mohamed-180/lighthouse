@@ -7,7 +7,6 @@
 
 const PredictivePerf = require('../../audits/predictive-perf.js');
 const Runner = require('../../runner.js');
-const assert = require('assert');
 
 const acceptableTrace = require('../fixtures/traces/progressive-app-m60.json');
 const acceptableDevToolsLog = require('../fixtures/traces/progressive-app-m60.devtools.log.json');

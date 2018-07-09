@@ -7,7 +7,6 @@
 
 const Audit = require('../../audits/metrics.js');
 const Runner = require('../../runner.js');
-const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app-m60.json');
 const pwaDevtoolsLog = require('../fixtures/traces/progressive-app-m60.devtools.log.json');
