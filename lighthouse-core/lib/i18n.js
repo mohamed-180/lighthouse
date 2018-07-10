@@ -20,7 +20,7 @@ try {
   // @ts-ignore
   require('intl');
   // @ts-ignore
-  Intl.NumberFormat   = IntlPolyfill.NumberFormat;
+  Intl.NumberFormat = IntlPolyfill.NumberFormat;
   // @ts-ignore
   Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 } catch (_) {}
@@ -43,33 +43,46 @@ const formats = {
   },
 };
 
+function preprocessMessageValues(msg, values) {
+  const parsed = MessageParser.parse(msg);
+  // Replace all the bytes with KB
+  parsed.elements
+    .filter(el => el.format && el.format.style === 'bytes')
+    .forEach(el => (values[el.id] = values[el.id] / 1024));
+}
+
 module.exports = {
   UI_STRINGS,
   /**
    * @param {string} filename
-   * @param {Record<string, string>} localStrings
+   * @param {Record<string, string>} fileStrings
    */
-  createStringFormatter(filename, localStrings) {
-    const mergedStrings = {...UI_STRINGS, ...localStrings};
+  createStringFormatter(filename, fileStrings) {
+    const mergedStrings = {...UI_STRINGS, ...fileStrings};
     /** @param {string} msg @param {*} [values] */
-    const format = (msg, values) => {
+    const formatFn = (msg, values) => {
       const keyname = Object.keys(mergedStrings).find(key => mergedStrings[key] === msg);
       if (!keyname) throw new Error(`Could not locate: ${msg}`);
-
-      const parsed = MessageParser.parse(msg);
-      parsed.elements
-        .filter(el => el.format && el.format.style === 'bytes')
-        .forEach(el => (values[el.id] = values[el.id] / 1024));
+      preprocessMessageValues(msg, values);
 
       const filenameToLookup = keyname in UI_STRINGS ? __filename : filename;
       const lookupKey = path.relative(LH_ROOT, filenameToLookup) + '!#' + keyname;
       const localeStrings = LOCALES[locale] || {};
-      const localeForMessageFormat = locale === 'gibberish' ? 'de-DE' : locale;
-      const formatter = new MessageFormat(localeStrings[lookupKey] || msg, localeForMessageFormat, formats);
+      // fallback to the original english message if we couldn't find a message in the specified locale
+      // better to have an english message than no message at all, in some number cases it won't even matter
+      const messageForMessageFormat = localeStrings[lookupKey] || msg
+      // when using accented english, force the use of a different locale for numbers
+      const localeForMessageFormat = locale === 'en-XA' ? 'de-DE' : locale;
+
+      const formatter = new MessageFormat(
+        messageForMessageFormat,
+        localeForMessageFormat,
+        formats
+      );
       return formatter.format(values);
     };
 
-    return format;
+    return formatFn;
   },
   /** @param {string} newLocale */
   setLocale(newLocale) {

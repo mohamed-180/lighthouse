@@ -119,7 +119,11 @@ function getFlags(manualArgv) {
         'disable-storage-reset', 'disable-device-emulation', 'save-assets', 'list-all-audits',
         'list-trace-categories', 'view', 'verbose', 'quiet', 'help',
       ])
-      .choices('locale', ['en-US', 'de-DE', 'gibberish'])
+      .choices('locale', [
+        'en-US', // English
+        'de-DE', // German
+        'en-XA', // Accented English, good for testing
+      ])
       .choices('output', printer.getValidOutputOptions())
       .choices('throttling-method', ['devtools', 'provided', 'simulate'])
       .choices('preset', ['full', 'perf', 'mixed-content'])
